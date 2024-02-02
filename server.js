@@ -83,4 +83,5 @@ app.delete("/collection/:collectionName/:id", (req, res, next) => {
   );
 });
 
-app.listen(3001, () => console.log("Mongo app listening on port 3001!"));
+const port = process.env.PORT || 3001;
+app.listen(port, () => console.log("Mongo app listening on port 3001!"));
