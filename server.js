@@ -72,6 +72,32 @@ app.get("/collection/:collectionName", (req, res, next) => {
   });
 });
 
+app.get("/search", async (req, res) => {
+  const query = req.query.query.toLowerCase().trim();
+  try {
+    let searchResults;
+    if (!query) {
+      // If query is empty, return an empty array
+      searchResults = [];
+    } else {
+      // Find lessons matching the search query (partial match)
+      searchResults = await db
+        .collection("products")
+        .find({
+          $or: [
+            { programme: { $regex: query, $options: "i" } }, // Case-insensitive partial match
+            { location: { $regex: query, $options: "i" } }, // Case-insensitive partial match
+          ],
+        })
+        .toArray();
+    }
+    res.json(searchResults);
+  } catch (error) {
+    console.error("Error searching lessons:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 app.post("/collection/:collectionName", (req, res, next) => {
   req.collection.insert(req.body, (e, results) => {
     if (e) return next(e);
